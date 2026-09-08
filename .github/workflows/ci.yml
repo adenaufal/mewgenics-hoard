@@ -27,9 +27,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Split dataset
-        run: node scripts/split-dataset.mjs
-
       - name: Lint
         run: pnpm lint
 
