@@ -1,60 +1,60 @@
-import { useRef, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { Download, Upload, RotateCcw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ConfirmDialog } from '@/components/ConfirmDialog'
-import { useDataset } from '@/lib/useDataset'
-import { useTracker } from '@/stores/tracker'
+import { useRef, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Download, Upload, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useDataset } from "@/lib/useDataset";
+import { useTracker } from "@/stores/tracker";
 
-export const Route = createFileRoute('/data')({
+export const Route = createFileRoute("/data")({
   component: DataPage,
-})
+});
 
 function DataPage() {
-  const ds = useDataset()
-  const exportJSON = useTracker((s) => s.exportJSON)
-  const importJSON = useTracker((s) => s.importJSON)
-  const reset = useTracker((s) => s.reset)
-  const storage = useTracker((s) => s.storage)
-  const cats = useTracker((s) => s.cats)
-  const plannedSets = useTracker((s) => s.plannedSets)
-  const overrides = useTracker((s) => s.overrides)
+  const ds = useDataset();
+  const exportJSON = useTracker((s) => s.exportJSON);
+  const importJSON = useTracker((s) => s.importJSON);
+  const reset = useTracker((s) => s.reset);
+  const storage = useTracker((s) => s.storage);
+  const cats = useTracker((s) => s.cats);
+  const plannedSets = useTracker((s) => s.plannedSets);
+  const overrides = useTracker((s) => s.overrides);
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [confirmReset, setConfirmReset] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const handleExport = () => {
-    const json = exportJSON()
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `mewgenics-hoard-${ts}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    toast.success('Exported tracker state')
-  }
+    const json = exportJSON();
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mewgenics-hoard-${ts}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Exported tracker state");
+  };
 
   const handleImport = async (file: File) => {
     try {
-      const text = await file.text()
-      const result = importJSON(text)
-      if (result.ok) toast.success('Imported tracker state')
-      else toast.error(`Import failed: ${result.error}`)
+      const text = await file.text();
+      const result = importJSON(text);
+      if (result.ok) toast.success("Imported tracker state");
+      else toast.error(`Import failed: ${result.error}`);
     } catch (e) {
-      toast.error(`Read failed: ${e instanceof Error ? e.message : String(e)}`)
+      toast.error(`Read failed: ${e instanceof Error ? e.message : String(e)}`);
     }
-  }
+  };
 
-  const totalItems = Object.values(storage).reduce((a, b) => a + b, 0)
-  const itemTypes = Object.keys(storage).filter((k) => storage[k]! > 0).length
-  const planned = Object.keys(plannedSets).filter((k) => plannedSets[k]).length
-  const overridden = Object.keys(overrides).length
+  const totalItems = Object.values(storage).reduce((a, b) => a + b, 0);
+  const itemTypes = Object.keys(storage).filter((k) => storage[k]! > 0).length;
+  const planned = Object.keys(plannedSets).filter((k) => plannedSets[k]).length;
+  const overridden = Object.keys(overrides).length;
 
   return (
     <section className="flex flex-col gap-3">
@@ -71,11 +71,11 @@ function DataPage() {
             <Stat
               label="Dataset"
               value={
-                ds.status === 'ready'
+                ds.status === "ready"
                   ? `${ds.data.items.length} items · ${ds.data.sets.length} sets`
-                  : ds.status === 'loading'
-                    ? 'loading...'
-                    : 'failed'
+                  : ds.status === "loading"
+                    ? "loading..."
+                    : "failed"
               }
             />
           </dl>
@@ -86,8 +86,8 @@ function DataPage() {
         <CardContent className="flex flex-col gap-3 px-4 py-3">
           <h3 className="text-sm font-semibold">Backup</h3>
           <p className="text-xs text-stone-600">
-            Tracker state lives in browser localStorage. Export to a JSON file to
-            back up or move between browsers.
+            Tracker state lives in browser localStorage. Export to a JSON file
+            to back up or move between browsers.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button onClick={handleExport}>
@@ -105,9 +105,9 @@ function DataPage() {
               accept="application/json,.json"
               className="hidden"
               onChange={(e) => {
-                const f = e.target.files?.[0]
-                if (f) void handleImport(f)
-                e.target.value = ''
+                const f = e.target.files?.[0];
+                if (f) void handleImport(f);
+                e.target.value = "";
               }}
             />
           </div>
@@ -137,13 +137,13 @@ function DataPage() {
         confirmLabel="Reset"
         destructive
         onConfirm={() => {
-          reset()
-          toast('Tracker reset')
-          setConfirmReset(false)
+          reset();
+          toast("Tracker reset");
+          setConfirmReset(false);
         }}
       />
     </section>
-  )
+  );
 }
 
 function Stat({ label, value }: { label: string; value: number | string }) {
@@ -154,5 +154,5 @@ function Stat({ label, value }: { label: string; value: number | string }) {
       </dt>
       <dd className="text-sm font-semibold">{value}</dd>
     </div>
-  )
+  );
 }
